@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { auth } from "./firebase";
+import { signOut } from "firebase/auth";
+import Login from "./components/Login";
+import Notes from "./components/Notes";
 
-function App() {
+const App = () => {
+  const [user, setUser] = useState(null);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {user ? (
+        <div>
+          <nav className="flex justify-between p-4 bg-gray-200">
+            <h1 className="text-lg font-bold">Google Keep Clone</h1>
+            <button onClick={() => signOut(auth).then(() => setUser(null))} className="bg-red-500 text-white px-3 py-1 rounded">
+              Logout
+            </button>
+          </nav>
+          <Notes user={user} />
+        </div>
+      ) : (
+        <Login setUser={setUser} />
+      )}
     </div>
   );
-}
+};
 
 export default App;
+

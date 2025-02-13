@@ -1,0 +1,24 @@
+import React from "react";
+import { auth, provider } from "../firebase";
+import { signInWithPopup } from "firebase/auth";
+
+const Login = ({ setUser }) => {
+  const signIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      setUser(result.user);
+    } catch (error) {
+      console.error("Login Error:", error);
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <button onClick={signIn} className="px-4 py-2 bg-blue-500 text-white rounded">
+        Sign in with Google
+      </button>
+    </div>
+  );
+};
+
+export default Login;
