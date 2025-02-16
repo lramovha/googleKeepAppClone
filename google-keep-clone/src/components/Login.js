@@ -1,12 +1,11 @@
-import React from "react";
-import { auth, provider } from "../firebase";
-import { signInWithPopup } from "firebase/auth";
+import React, { useState } from "react";
+import { auth, provider, signInWithPopup } from "../firebase";
 
 const Login = ({ setUser }) => {
   const signIn = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
+      setUser(result.user); // Store user details
     } catch (error) {
       console.error("Login Error:", error);
     }

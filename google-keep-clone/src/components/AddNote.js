@@ -1,48 +1,50 @@
 import React, { useState } from "react";
-import { addNote } from "../services/notesService";
+import { db, collection, addDoc } from "../firebase";
 
-const AddNote = ({ onNoteAdded }) => {
+const AddNote = ({ userId }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!title.trim() || !content.trim()) return; // Prevent empty notes
+  const handleAddNote = async () => {
+    if (!userId) return alert("Please log in to add notes");
 
-    await addNote(title, content);
-    setTitle(""); // Reset form
-    setContent("");
-    onNoteAdded(); // Trigger refresh
+    try {
+      await addDoc(collection(db, "users", userId, "notes"), {
+        title,
+        content,
+        timestamp: new Date(),
+      });
+      setTitle("");
+      setContent("");
+    } catch (error) {
+      console.error("Error adding note:", error);
+    }
   };
 
   return (
-    <div className="mb-4">
-      <h2 className="text-xl font-bold mb-2">Add a Note</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-        <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="border p-2 rounded"
-          required
-        />
-        <textarea
-          placeholder="Content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="border p-2 rounded"
-          required
-        />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-          Add Note
-        </button>
-      </form>
+    <div className="p-4">
+      <input
+        type="text"
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="border p-2 w-full mb-2"
+      />
+      <textarea
+        placeholder="Content"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        className="border p-2 w-full"
+      />
+      <button onClick={handleAddNote} className="mt-2 px-4 py-2 bg-green-500 text-white rounded">
+        Add Note
+      </button>
     </div>
   );
 };
 
 export default AddNote;
+
 
 
 

@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { db, collection, getDocs, deleteDoc, doc } from "../firebase";
 
-const Notes = () => {
+const Notes = ({ userId }) => {
   const [notes, setNotes] = useState([]);
-  const [loading, setLoading] = useState(true); // Track loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchNotes();
-  }, []);
+    if (userId) {
+      fetchNotes();
+    }
+  }, [userId]);
 
   const fetchNotes = async () => {
     setLoading(true);
     try {
-      const querySnapshot = await getDocs(collection(db, "notes"));
+      const querySnapshot = await getDocs(collection(db, "users", userId, "notes"));
       const notesArray = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setNotes(notesArray);
     } catch (error) {
@@ -23,8 +25,8 @@ const Notes = () => {
 
   const handleDelete = async (noteId) => {
     try {
-      await deleteDoc(doc(db, "notes", noteId));
-      fetchNotes(); // Refetch notes after deletion
+      await deleteDoc(doc(db, "users", userId, "notes", noteId));
+      fetchNotes();
     } catch (error) {
       console.error("Error deleting note:", error);
     }
@@ -34,7 +36,7 @@ const Notes = () => {
     <div className="p-4">
       <h2 className="text-xl font-bold">Your Notes</h2>
       {loading ? (
-        <p>Loading notes...</p> // Show loading message while fetching
+        <p>Loading notes...</p>
       ) : notes.length === 0 ? (
         <p>No notes yet.</p>
       ) : (
@@ -53,4 +55,5 @@ const Notes = () => {
 };
 
 export default Notes;
+
 
