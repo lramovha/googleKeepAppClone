@@ -1,70 +1,56 @@
-import React, { useEffect, useState } from "react";
-import { db } from "../firebase";
-import { collection, addDoc, onSnapshot, deleteDoc, doc } from "firebase/firestore";
-import { FaTrash } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { db, collection, getDocs, deleteDoc, doc } from "../firebase";
 
-const Notes = ({ user }) => {
+const Notes = () => {
   const [notes, setNotes] = useState([]);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(true); // Track loading state
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "notes"), (snapshot) => {
-      setNotes(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-    });
-    return unsubscribe;
+    fetchNotes();
   }, []);
 
-  const addNote = async () => {
-    if (!title || !content) return;
-    await addDoc(collection(db, "notes"), {
-      title,
-      content,
-      userId: user.uid,
-      timestamp: new Date(),
-    });
-    setTitle("");
-    setContent("");
+  const fetchNotes = async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, "notes"));
+      const notesArray = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setNotes(notesArray);
+    } catch (error) {
+      console.error("Error fetching notes:", error);
+    }
+    setLoading(false);
   };
 
-  const deleteNote = async (id) => {
-    await deleteDoc(doc(db, "notes", id));
+  const handleDelete = async (noteId) => {
+    try {
+      await deleteDoc(doc(db, "notes", noteId));
+      fetchNotes(); // Refetch notes after deletion
+    } catch (error) {
+      console.error("Error deleting note:", error);
+    }
   };
 
   return (
-    <div className="p-5">
-      <div className="flex flex-col mb-5">
-        <input
-          type="text"
-          placeholder="Title"
-          className="border p-2 mb-2"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <textarea
-          placeholder="Take a note..."
-          className="border p-2"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        ></textarea>
-        <button onClick={addNote} className="mt-2 px-4 py-2 bg-green-500 text-white rounded">
-          Add Note
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {notes.map((note) => (
-          <div key={note.id} className="p-4 border shadow-lg rounded-lg relative">
-            <h2 className="font-bold">{note.title}</h2>
+    <div className="p-4">
+      <h2 className="text-xl font-bold">Your Notes</h2>
+      {loading ? (
+        <p>Loading notes...</p> // Show loading message while fetching
+      ) : notes.length === 0 ? (
+        <p>No notes yet.</p>
+      ) : (
+        notes.map((note) => (
+          <div key={note.id} className="p-4 border rounded my-2 bg-white shadow">
+            <h3 className="font-bold">{note.title}</h3>
             <p>{note.content}</p>
-            <button onClick={() => deleteNote(note.id)} className="absolute top-2 right-2 text-red-500">
-              <FaTrash />
+            <button onClick={() => handleDelete(note.id)} className="mt-2 px-3 py-1 bg-red-500 text-white rounded">
+              Delete
             </button>
           </div>
-        ))}
-      </div>
+        ))
+      )}
     </div>
   );
 };
 
 export default Notes;
+

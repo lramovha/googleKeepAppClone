@@ -1,12 +1,14 @@
-import { db, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "../firebase";
+import { db } from "../firebase";
+import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "firebase/firestore";
 
 // Firestore collection reference
 const notesCollection = collection(db, "notes");
 
-// Add a new note
-export const addNote = async (title, content) => {
+// Add a new note with the user's ID
+export const addNote = async (userId, title, content) => {
   try {
     await addDoc(notesCollection, {
+      userId,  // Associate note with the logged-in user
       title,
       content,
       timestamp: new Date(),
@@ -16,10 +18,11 @@ export const addNote = async (title, content) => {
   }
 };
 
-// Fetch all notes
-export const fetchNotes = async () => {
+// Fetch only notes for the logged-in user
+export const fetchNotes = async (userId) => {
   try {
-    const querySnapshot = await getDocs(notesCollection);
+    const q = query(notesCollection, where("userId", "==", userId));
+    const querySnapshot = await getDocs(q);
     let notesArray = [];
     querySnapshot.forEach((doc) => {
       notesArray.push({ id: doc.id, ...doc.data() });
