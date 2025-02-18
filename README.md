@@ -1,2 +1,2 @@
 # googleKeepAppClone
-this is a close for google keep app.
+this is a clone for google keep app.
