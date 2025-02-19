@@ -1,73 +1,89 @@
 import React, { useState } from "react";
 import { db, collection, addDoc } from "../firebase";
+import { Fab, TextField, Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import { SketchPicker } from "react-color"; // Import Color Picker
 
-const AddNote = ({ userId }) => {
+const AddNote = ({ userId, onNoteAdded }) => {
+  const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [color, setColor] = useState("#FFF8E1"); // Default color
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!title || !content) return;
+  const handleColorChange = (newColor) => {
+    setColor(newColor.hex);
+  };
+
+  const handleSubmit = async () => {
+    if (!title || !content) return; // Prevent empty notes
 
     try {
       await addDoc(collection(db, "notes"), {
         title,
         content,
-        userId,
+        userId, // Ensure userId is stored
+        color, // Save color in Firestore
         timestamp: new Date(),
       });
+
+      if (onNoteAdded) {
+        onNoteAdded(); // Ensure it only runs if passed from parent
+      }
+      setOpen(false);
       setTitle("");
       setContent("");
-      setIsOpen(false);
     } catch (error) {
       console.error("Error adding note:", error);
     }
   };
 
   return (
-    <div className="relative">
+    <>
       {/* Floating Add Button */}
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-10 right-10 bg-yellow-500 text-white p-4 rounded-full shadow-lg hover:bg-yellow-600 transition"
-        >
-          +
-        </button>
-      )}
+      <Fab
+        color="primary"
+        aria-label="add"
+        onClick={() => setOpen(true)}
+        sx={{ position: "fixed", bottom: 20, right: 20, backgroundColor: "#FFBF00" }}
+      >
+        <AddIcon />
+      </Fab>
 
-      {/* Note Input Box */}
-      {isOpen && (
-        <form
-          onSubmit={handleSubmit}
-          className="fixed bottom-16 right-10 bg-white p-4 rounded-lg shadow-lg w-80"
-        >
-          <input
-            type="text"
-            placeholder="Title"
+      {/* Modal for Adding Note */}
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Add Note</DialogTitle>
+        <DialogContent>
+          <SketchPicker color={color} onChangeComplete={handleColorChange} />
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Title"
+            fullWidth
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-2 border-b mb-2 focus:outline-none"
           />
-          <textarea
-            placeholder="Take a note..."
+          <TextField
+            margin="dense"
+            label="Content"
+            fullWidth
+            multiline
+            rows={4}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full p-2 border rounded focus:outline-none"
           />
-          <div className="flex justify-between mt-2">
-            <button type="submit" className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
-              Save
-            </button>
-            <button onClick={() => setIsOpen(false)} className="px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500">
-              Cancel
-            </button>
-          </div>
-        </form>
-      )}
-    </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
 export default AddNote;
+

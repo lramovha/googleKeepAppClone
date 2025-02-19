@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { 
+  getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, getDocs, updateDoc 
+} from "firebase/firestore";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 // Firebase configuration using environment variables
@@ -19,13 +21,13 @@ const db = getFirestore(app); // Firestore instance
 const auth = getAuth(app); // Firebase Authentication
 const provider = new GoogleAuthProvider(); // Google Sign-In
 
-signInWithPopup(auth, provider)
-  .then((result) => {
-    console.log("User signed in:", result.user);
-  })
-  .catch((error) => {
-    console.error("Sign-in error:", error);
-  });
+// signInWithPopup(auth, provider)
+//   .then((result) => {
+//     console.log("User signed in:", result.user);
+//   })
+//   .catch((error) => {
+//     console.error("Sign-in error:", error);
+//   });
 
 
-export { db, auth, provider, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, signInWithPopup };
+export { db, auth, provider, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, getDocs, updateDoc, signInWithPopup };
