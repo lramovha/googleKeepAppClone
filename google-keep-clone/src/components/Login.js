@@ -25,7 +25,7 @@ const Login = ({ setUser }) => {
       <Card sx={{ p: 4, textAlign: "center", maxWidth: 400 }}>
         <CardContent>
           <Typography variant="h5" fontWeight="bold" gutterBottom>
-            Welcome to Your Notes App
+            Google keep Notes App clone
           </Typography>
           <Typography variant="body2" color="textSecondary" mb={2}>
             Sign in to access your notes securely.
