@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import { auth, provider, signInWithPopup } from "../firebase";
-import { Card, CardContent, Typography, Button, CircularProgress } from "@mui/material";
-import GoogleIcon from "@mui/icons-material/Google"; // Google Icon for the button
+import {
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  CircularProgress,
+  Box,
+} from "@mui/material";
+import GoogleIcon from "@mui/icons-material/Google";
 
 const Login = ({ setUser }) => {
   const [loading, setLoading] = useState(false);
@@ -21,13 +28,23 @@ const Login = ({ setUser }) => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <Card sx={{ p: 4, textAlign: "center", maxWidth: 400 }}>
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(to right, #ff9a9e, #fad0c4)", // Gradient background
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <Card sx={{ p: 4, textAlign: "center", maxWidth: 400, boxShadow: 6, borderRadius: 3 }}>
         <CardContent>
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
-            Google keep Notes App clone
+          <Typography variant="h4" fontWeight="bold" color="#333" gutterBottom>
+            Keep Clone
           </Typography>
-          <Typography variant="body2" color="textSecondary" mb={2}>
+          <Typography variant="body1" color="textSecondary" mb={2}>
             Sign in to access your notes securely.
           </Typography>
 
@@ -37,20 +54,28 @@ const Login = ({ setUser }) => {
             </Typography>
           )}
 
-          <Button 
-            variant="contained" 
-            color="primary" 
-            startIcon={<GoogleIcon />} 
-            onClick={signIn} 
+          <Button
+            variant="contained"
+            sx={{
+              width: "100%",
+              py: 1.5,
+              backgroundColor: "#4285F4",
+              color: "white",
+              fontWeight: "bold",
+              "&:hover": { backgroundColor: "#357ae8" },
+              borderRadius: "20px", // Rounded button
+            }}
+            startIcon={<GoogleIcon />}
+            onClick={signIn}
             disabled={loading}
-            sx={{ width: "100%", py: 1.5 }}
           >
             {loading ? <CircularProgress size={24} color="inherit" /> : "Sign in with Google"}
           </Button>
         </CardContent>
       </Card>
-    </div>
+    </Box>
   );
 };
 
 export default Login;
+

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import AddNote from "./components/AddNote";
 import Notes from "./components/Notes";
 import Login from "./components/Login";
+import NavBar from "./components/NavBar";
 import { auth } from "./firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { Container, AppBar, Toolbar, Typography, Button } from "@mui/material";
