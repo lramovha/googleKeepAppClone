@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 import AddNote from "./components/AddNote";
 import Notes from "./components/Notes";
 import Login from "./components/Login";
 import NavBar from "./components/NavBar";
 import { auth } from "./firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { Container, AppBar, Toolbar, Typography, Button } from "@mui/material";
+import { Container } from "@mui/material";
 
 const App = () => {
   const [user, setUser] = useState(null);
+  const [darkMode, setDarkMode] = useState(false); // ✅ Dark Mode State
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -25,31 +28,38 @@ const App = () => {
     }
   };
 
-  return (
-    <div>
-      {user ? (
-        <>
-          <AppBar position="static" sx={{ backgroundColor: "#FFBF00" }}>
-            <Toolbar>
-              <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                Keep Clone
-              </Typography>
-              <Button color="inherit" onClick={handleLogout}>
-                Logout
-              </Button>
-            </Toolbar>
-          </AppBar>
+  // ✅ Toggle Theme Function
+  const toggleDarkMode = () => {
+    setDarkMode((prevMode) => !prevMode);
+  };
 
-          <Container sx={{ mt: 4 }}>
-            <AddNote userId={user.uid} />
-            <Notes userId={user.uid} />
-          </Container>
-        </>
-      ) : (
-        <Login setUser={setUser} />
-      )}
-    </div>
+  // ✅ Create MUI Theme
+  const theme = createTheme({
+    palette: {
+      mode: darkMode ? "dark" : "light",
+    },
+  });
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <div>
+        {user ? (
+          <>
+            <NavBar user={user} handleLogout={handleLogout} darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Container sx={{ mt: 4 }}>
+              <AddNote userId={user.uid} />
+              <Notes userId={user.uid} />
+            </Container>
+          </>
+        ) : (
+          <Login setUser={setUser} />
+        )}
+      </div>
+    </ThemeProvider>
   );
 };
 
 export default App;
+
+
